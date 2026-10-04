@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "registryId": "pab-official",
+  "generatedAt": "2026-10-04T00:00:00Z",
+  "publicKeys": {
+    "pab-release-2026": "-----BEGIN PUBLIC KEY-----\nREPLACE_WITH_CORE_PINNED_ED25519_KEY\n-----END PUBLIC KEY-----"
+  },
+  "abilities": [
+    {
+      "schemaVersion": 1,
+      "id": "com.pab.pocket-cortex",
+      "name": "Pocket Cortex",
+      "displayName": "口袋记忆",
+      "version": "1.0.0",
+      "description": "Local-first personal memory ability.",
+      "category": "memory",
+      "author": "Personal Ability Base",
+      "repository": "https://github.com/PersonalAbilityBase/ability-pocket-cortex",
+      "releaseUrl": "https://github.com/PersonalAbilityBase/ability-pocket-cortex/releases/tag/v1.0.0",
+      "packageUrl": "https://github.com/PersonalAbilityBase/ability-pocket-cortex/releases/download/v1.0.0/pocket-cortex-1.0.0.zip",
+      "sha256": "e17a52398b426d17c001f27b9555f90514e09b6a67ee716c537098b69c3470fd",
+      "signature": {
+        "algorithm": "ed25519",
+        "keyId": "pab-release-2026",
+        "value": "REPLACE_WITH_RELEASE_SIGNATURE",
+        "signedPayload": "package"
+      },
+      "trust": "official",
+      "platforms": ["windows", "android"],
+      "permissions": ["storage.private", "memory.read", "memory.write"],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "minCoreVersion": "0.1.0",
+      "releaseNotes": "Initial release"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "com.pab.skill-hud",
+      "name": "Skill HUD",
+      "displayName": "技能执行",
+      "version": "1.0.0",
+      "description": "Personal skill execution dashboard.",
+      "category": "execution",
+      "author": "Personal Ability Base",
+      "repository": "https://github.com/PersonalAbilityBase/ability-skill-hud",
+      "packageUrl": "https://github.com/PersonalAbilityBase/ability-skill-hud/releases/download/v1.0.0/skill-hud-1.0.0.zip",
+      "sha256": "28f540a0d6291021fffdc7fbb49d7d4cbc66d91dcf1409486a8b478b26889575",
+      "signature": {
+        "algorithm": "ed25519",
+        "keyId": "pab-release-2026",
+        "value": "REPLACE_WITH_RELEASE_SIGNATURE",
+        "signedPayload": "package"
+      },
+      "trust": "official",
+      "platforms": ["windows", "android"],
+      "permissions": ["storage.private"],
+      "dependencies": {"com.pab.pocket-cortex": "^1.0.0"},
+      "minCoreVersion": "0.1.0",
+      "releaseNotes": "Initial release"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "com.pab.capture-everything",
+      "name": "Capture Everything",
+      "displayName": "随手捕获",
+      "version": "0.1.0",
+      "description": "Capture thoughts, links, and shared content before they disappear.",
+      "category": "capture",
+      "author": "Personal Ability Base",
+      "repository": "https://github.com/PersonalAbilityBase/ability-capture-everything",
+      "releaseUrl": "https://github.com/PersonalAbilityBase/ability-capture-everything/releases/tag/v0.1.0",
+      "packageUrl": "https://github.com/PersonalAbilityBase/ability-capture-everything/releases/download/v0.1.0/capture-everything-0.1.0.zip",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": {
+        "algorithm": "ed25519",
+        "keyId": "pab-release-2026",
+        "value": "REPLACE_WITH_RELEASE_SIGNATURE",
+        "signedPayload": "package"
+      },
+      "trust": "official",
+      "platforms": ["windows", "android"],
+      "permissions": ["storage.private", "memory.read", "memory.write", "clipboard", "notifications"],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "minCoreVersion": "0.1.0",
+      "releaseNotes": "Initial portable quick-capture inbox for Windows and Android."
+    }
+  ],
+  "packs": [
+    {
+      "id": "pab-starter",
+      "name": "PAB Starter Pack",
+      "description": "A safe starting set of official abilities.",
+      "abilities": ["com.pab.pocket-cortex", "com.pab.skill-hud", "com.pab.capture-everything"],
+      "trust": "official"
+    },
+    {
+      "id": "capture-workbench",
+      "name": "Capture Workbench",
+      "description": "A minimal inbox for quick capture and local recall.",
+      "abilities": ["com.pab.capture-everything", "com.pab.pocket-cortex"],
+      "trust": "official"
+    }
+  ],
+  "loadouts": [
+    {
+      "id": "daily",
+      "name": "Daily",
+      "description": "A calm default for everyday capture, memory, and execution.",
+      "icon": "☼",
+      "abilityIds": ["com.pab.pocket-cortex", "com.pab.skill-hud", "com.pab.capture-everything"],
+      "default": true,
+      "order": 0
+    },
+    {
+      "id": "capture",
+      "name": "Capture",
+      "description": "Keep the quick-capture inbox one gesture away.",
+      "icon": "⊙",
+      "abilityIds": ["com.pab.capture-everything", "com.pab.pocket-cortex"],
+      "order": 1
+    }
+  ]
+}

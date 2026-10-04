@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "com.example.my-ability",
+  "name": "My Ability",
+  "displayName": "我的能力",
+  "version": "0.1.0",
+  "description": "Describe what this Ability adds to Personal Ability Base.",
+  "author": "Your Name",
+  "minCoreVersion": "0.1.0",
+  "platforms": ["windows", "android"],
+  "permissions": [],
+  "dependencies": {},
+  "optionalDependencies": {},
+  "conflicts": {},
+  "contributes": { "pages": [], "commands": [], "cards": [], "searchProviders": [], "workflows": [], "settings": [] },
+  "entry": "dist/index.js",
+  "runtime": { "type": "pab-js", "apiVersion": 1 }
+}

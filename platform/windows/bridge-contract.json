@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "platform": "windows",
+  "status": "scaffold",
+  "commands": [
+    { "name": "getSnapshot", "permission": null },
+    { "name": "executeCommand", "permission": "commands.execute" },
+    { "name": "installAbility", "permission": "network" },
+    { "name": "capture", "permission": "storage.private" },
+    { "name": "recall", "permission": "memory.read" }
+  ],
+  "events": [
+    "capture.created",
+    "memory.created",
+    "memory.updated",
+    "skill.started",
+    "skill.finished",
+    "review.created"
+  ],
+  "surfaces": [
+    "global-hotkey",
+    "notifications",
+    "system-tray",
+    "app-link"
+  ],
+  "nativeArtifacts": {
+    "exe": false,
+    "msix": false,
+    "signed": false
+  }
+}

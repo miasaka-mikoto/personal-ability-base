@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "com.pab.decision-forge",
+  "name": "Decision Forge",
+  "displayName": "决策工坊",
+  "version": "0.1.0",
+  "description": "Frame choices, compare options, and record a reviewable decision trail.",
+  "author": "Personal Ability Base",
+  "minCoreVersion": "0.1.0",
+  "platforms": ["windows", "android", "linux", "macos", "web"],
+  "permissions": ["storage.private", "memory.read", "memory.write", "notifications"],
+  "dependencies": {},
+  "optionalDependencies": { "com.pab.pocket-cortex": ">=0.1.0" },
+  "conflicts": {},
+  "contributes": {
+    "pages": [{ "id": "decision-forge.home", "title": "Decision Forge", "route": "/abilities/decision-forge" }],
+    "commands": [
+      { "id": "decision-forge.create", "title": "Create decision" },
+      { "id": "decision-forge.review", "title": "Review decision" }
+    ],
+    "cards": [{ "id": "decision-forge.open", "title": "Open decisions", "size": "medium" }],
+    "searchProviders": [{ "id": "decision-forge.search", "title": "Decisions", "priority": 70 }],
+    "workflows": [{ "id": "decision-forge.after-review", "trigger": "decision.reviewed" }],
+    "settings": [{ "id": "decision-forge.defaultHorizon", "type": "number", "default": 30 }]
+  },
+  "entry": "dist/index.js",
+  "runtime": { "type": "pab-js", "apiVersion": 1 },
+  "source": { "kind": "official", "repository": "PersonalAbilityBase/ability-decision-forge" },
+  "releaseNotes": "Initial structured decision and review workflow."
+}

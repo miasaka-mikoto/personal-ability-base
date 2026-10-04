@@ -1,0 +1,5 @@
+Personal Ability Base (PAB) is an independent implementation.
+
+SiYuan is not bundled in this repository. Any future SiYuan adapter must keep
+its upstream AGPL-3.0 license, notices, and source obligations separate from
+the PAB MIT-licensed code.

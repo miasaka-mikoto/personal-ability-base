@@ -1,0 +1,8 @@
+{
+  "id": "com.pab.decision-forge",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "entrySha256": "5bdc473d1fb3f42f528e985d779aac73ec980f427790428a20ad11f9dcc3ae9d",
+  "builtAt": "2026-10-04T10:34:04.384Z",
+  "cliVersion": "0.1.0"
+}

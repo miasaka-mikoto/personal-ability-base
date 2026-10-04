@@ -1,0 +1,33 @@
+name: PAB CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - name: Run no-network acceptance lane
+        run: npm run check:offline
+      - name: Prepare source-only release bundle
+        run: npm run release:source
+      - name: Verify source-only release bundle
+        run: npm run release:check
+      - name: Upload source bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: pab-source-${{ github.sha }}
+          path: dist/releases/
+          if-no-files-found: error

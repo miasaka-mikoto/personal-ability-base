@@ -1,0 +1,34 @@
+{
+  "name": "@pab/ability-sdk",
+  "version": "0.1.0",
+  "description": "Runtime-neutral SDK for Personal Ability Base modules",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "default": "./index.js"
+    },
+    "./manifest": {
+      "types": "./manifest.d.ts",
+      "import": "./manifest.js",
+      "default": "./manifest.js"
+    },
+    "./testing": {
+      "types": "./testing.d.ts",
+      "import": "./testing.js",
+      "default": "./testing.js"
+    },
+    "./events": {
+      "types": "./events.d.ts",
+      "import": "./events.js",
+      "default": "./events.js"
+    }
+  },
+  "files": ["index.js", "index.d.ts", "manifest.js", "manifest.d.ts", "testing.js", "testing.d.ts", "events.js", "events.d.ts", "src"],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}

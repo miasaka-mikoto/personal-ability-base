@@ -1,0 +1,10 @@
+import type { AbilityManifest, Permission, Platform } from "./index.js";
+export const MANIFEST_SCHEMA_VERSION: 1;
+export const PLATFORMS: readonly Platform[];
+export const PERMISSIONS: readonly Permission[];
+export const CONTRIBUTION_KEYS: readonly string[];
+export function isSemver(value: unknown): value is string;
+export function isAbilityId(value: unknown): value is string;
+export function validateManifest(input: unknown, options?: { platforms?: readonly Platform[]; permissions?: readonly Permission[] }): { valid: boolean; errors: Array<{ path: string; code: string; message: string }>; manifest: AbilityManifest };
+export function assertValidManifest(input: unknown, options?: unknown): AbilityManifest;
+export function createManifest(overrides?: Partial<AbilityManifest>): AbilityManifest;

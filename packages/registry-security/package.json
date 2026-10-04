@@ -1,0 +1,13 @@
+{
+  "name": "@personal-ability-base/registry-security",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline-first registry, trust and versioned module installation for Personal Ability Base",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types tests/registry-security.test.ts"
+  }
+}

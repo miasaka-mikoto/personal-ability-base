@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://personal-ability-base.dev/schemas/ability-registry.schema.json",
+  "title": "Personal Ability Base Ability Registry",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schemaVersion", "abilities"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "registryId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "publicKeys": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 } },
+    "abilities": { "type": "array", "items": { "$ref": "#/$defs/ability" } },
+    "packs": { "type": "array", "items": { "$ref": "#/$defs/pack" } },
+    "loadouts": { "type": "array", "items": { "$ref": "#/$defs/loadout" } }
+  },
+  "$defs": {
+    "semver": { "type": "string", "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$" },
+    "id": { "type": "string", "pattern": "^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$" },
+    "permission": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z0-9][a-z0-9_-]*)*$" },
+    "ability": {
+      "type": "object",
+      "required": ["schemaVersion", "id", "name", "version", "repository", "packageUrl", "sha256", "trust", "platforms", "minCoreVersion"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "displayName": { "type": "string" },
+        "version": { "$ref": "#/$defs/semver" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "category": { "type": "string" },
+        "author": { "type": "string" },
+        "repository": { "type": "string", "format": "uri-reference" },
+        "releaseUrl": { "type": "string", "format": "uri-reference" },
+        "packageUrl": { "type": "string", "format": "uri-reference" },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "signature": { "$ref": "#/$defs/signature" },
+        "trust": { "enum": ["official", "verified", "community", "local", "developer"] },
+        "platforms": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["windows", "android", "linux", "macos", "ios", "web"] } },
+        "permissions": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/permission" } },
+        "dependencies": { "$ref": "#/$defs/dependencies" },
+        "optionalDependencies": { "$ref": "#/$defs/dependencies" },
+        "conflicts": { "$ref": "#/$defs/dependencies" },
+        "minCoreVersion": { "$ref": "#/$defs/semver" },
+        "releaseNotes": { "type": "string" },
+        "screenshots": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": ["algorithm", "keyId", "value"],
+      "properties": {
+        "algorithm": { "const": "ed25519" },
+        "keyId": { "type": "string", "minLength": 1 },
+        "value": { "type": "string", "minLength": 1 },
+        "signedPayload": { "enum": ["package", "sha256"] }
+      }
+    },
+    "dependencies": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 }, "propertyNames": { "$ref": "#/$defs/id" } },
+    "pack": { "type": "object", "required": ["id", "name", "abilities"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "description": { "type": "string" }, "abilities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }, "trust": { "enum": ["official", "verified", "community", "local", "developer"] } } },
+    "loadout": { "type": "object", "required": ["id", "name", "abilityIds"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string", "minLength": 1 }, "description": { "type": "string" }, "icon": { "type": "string" }, "abilityIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }, "default": { "type": "boolean" }, "order": { "type": "integer", "minimum": 0 } } }
+  }
+}

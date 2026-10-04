@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "com.pab.skill-hud",
+  "name": "Skill HUD",
+  "displayName": "技能 HUD",
+  "version": "0.1.0",
+  "description": "A lightweight execution surface for skills, protocols, and live progress.",
+  "author": "Personal Ability Base",
+  "minCoreVersion": "0.1.0",
+  "platforms": ["windows", "android", "linux", "macos", "web"],
+  "permissions": ["storage.private", "notifications"],
+  "dependencies": {},
+  "optionalDependencies": {},
+  "conflicts": {},
+  "contributes": {
+    "pages": [{ "id": "skill-hud.home", "title": "Skill HUD", "route": "/abilities/skill-hud" }],
+    "commands": [{ "id": "skill-hud.start", "title": "Start skill" }, { "id": "skill-hud.stop", "title": "Stop skill" }],
+    "cards": [{ "id": "skill-hud.active", "title": "Active skill", "size": "small" }],
+    "searchProviders": [],
+    "workflows": [{ "id": "skill-hud.track", "trigger": "skill.started" }],
+    "settings": [{ "id": "skill-hud.compact", "type": "boolean", "default": false }]
+  },
+  "entry": "dist/index.js",
+  "runtime": { "type": "pab-js", "apiVersion": 1 },
+  "source": { "kind": "official", "repository": "PersonalAbilityBase/ability-skill-hud" },
+  "releaseNotes": "Initial event-driven skill progress HUD."
+}

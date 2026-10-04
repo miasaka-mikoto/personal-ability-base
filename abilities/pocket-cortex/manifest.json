@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "com.pab.pocket-cortex",
+  "name": "Pocket Cortex",
+  "displayName": "口袋皮层",
+  "version": "0.1.0",
+  "description": "Capture, recall, and connect personal memories through the shared Ability Bus.",
+  "author": "Personal Ability Base",
+  "minCoreVersion": "0.1.0",
+  "platforms": ["windows", "android", "linux", "macos", "web"],
+  "permissions": ["storage.private", "memory.read", "memory.write", "notifications"],
+  "dependencies": {},
+  "optionalDependencies": {},
+  "conflicts": {},
+  "contributes": {
+    "pages": [{ "id": "pocket-cortex.home", "title": "Pocket Cortex", "route": "/abilities/pocket-cortex" }],
+    "commands": [
+      { "id": "pocket-cortex.capture", "title": "Capture memory", "keybinding": "Ctrl+Shift+M" },
+      { "id": "pocket-cortex.recall", "title": "Recall memory" }
+    ],
+    "cards": [{ "id": "pocket-cortex.recent", "title": "Recent memories", "size": "wide" }],
+    "searchProviders": [{ "id": "pocket-cortex.search", "title": "Memories", "priority": 80 }],
+    "workflows": [],
+    "settings": [{ "id": "pocket-cortex.captureMode", "type": "select", "default": "ask" }]
+  },
+  "entry": "dist/index.js",
+  "runtime": { "type": "pab-js", "apiVersion": 1 },
+  "source": { "kind": "official", "repository": "PersonalAbilityBase/ability-pocket-cortex" },
+  "releaseNotes": "Initial portable capture and recall workflow."
+}

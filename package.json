@@ -1,0 +1,31 @@
+{
+  "name": "personal-ability-base",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal Ability Base（个人能力基地）— a modular, local-first operating system for personal capabilities",
+  "workspaces": [
+    "packages/*",
+    "apps/dashboard"
+  ],
+  "scripts": {
+    "test": "node --test packages/core/test/*.test.js packages/ability-sdk/test/*.test.mjs packages/ability-cli/test/*.test.mjs packages/platform-adapters/test/*.test.mjs && node --experimental-strip-types packages/registry-security/tests/registry-security.test.ts",
+    "smoke": "node scripts/smoke.mjs",
+    "e2e:v02": "node scripts/e2e-v02.mjs",
+    "demo:install": "node --experimental-strip-types scripts/demo-install.ts",
+    "validate:abilities": "node scripts/validate-abilities.mjs",
+    "validate:registry": "node --experimental-strip-types scripts/validate-registry.ts",
+    "dashboard:smoke": "npm --prefix apps/dashboard run smoke",
+    "dashboard:build": "npm --prefix apps/dashboard run build",
+    "dashboard:dev": "npm --prefix apps/dashboard run dev",
+    "platform:verify": "node scripts/release/verify-platform-scaffold.mjs",
+    "check:offline": "node scripts/release/check-offline.mjs",
+    "release:source": "node scripts/release/package-source.mjs",
+    "release:check": "node scripts/release/check-release.mjs",
+    "pab": "node packages/ability-cli/bin/pab.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "MIT"
+}

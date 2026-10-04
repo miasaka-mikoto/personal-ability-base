@@ -1,0 +1,46 @@
+/**
+ * Errors emitted by the Personal Ability Base core.
+ *
+ * Keeping stable error codes is important for the desktop/mobile shells: UI
+ * code can translate a code without parsing an exception message.
+ */
+export class PabError extends Error {
+  /** @param {string} code @param {string} message @param {Record<string, unknown>} [details] */
+  constructor(code, message, details = {}) {
+    super(message);
+    this.name = "PabError";
+    this.code = code;
+    this.details = details;
+  }
+}
+
+export const ErrorCode = Object.freeze({
+  INVALID_MANIFEST: "INVALID_MANIFEST",
+  INVALID_ID: "INVALID_ID",
+  INVALID_VERSION: "INVALID_VERSION",
+  CORE_VERSION_TOO_OLD: "CORE_VERSION_TOO_OLD",
+  // Alias used by the registry installer and older host shells.
+  CORE_VERSION_UNSUPPORTED: "CORE_VERSION_UNSUPPORTED",
+  PLATFORM_UNSUPPORTED: "PLATFORM_UNSUPPORTED",
+  PERMISSION_DENIED: "PERMISSION_DENIED",
+  PERMISSION_REQUIRED: "PERMISSION_REQUIRED",
+  MODULE_NOT_FOUND: "MODULE_NOT_FOUND",
+  MODULE_ALREADY_INSTALLED: "MODULE_ALREADY_INSTALLED",
+  MODULE_NOT_INSTALLED: "MODULE_NOT_INSTALLED",
+  MODULE_DISABLED: "MODULE_DISABLED",
+  DEPENDENCY_MISSING: "DEPENDENCY_MISSING",
+  DEPENDENCY_CONFLICT: "DEPENDENCY_CONFLICT",
+  DEPENDENCY_CYCLE: "DEPENDENCY_CYCLE",
+  HASH_MISMATCH: "HASH_MISMATCH",
+  SIGNATURE_INVALID: "SIGNATURE_INVALID",
+  TRUST_BLOCKED: "TRUST_BLOCKED",
+  DOWNLOAD_FAILED: "DOWNLOAD_FAILED",
+  PACKAGE_TOO_LARGE: "PACKAGE_TOO_LARGE",
+  MIGRATION_FAILED: "MIGRATION_FAILED",
+  ROLLBACK_UNAVAILABLE: "ROLLBACK_UNAVAILABLE",
+  COMMAND_NOT_FOUND: "COMMAND_NOT_FOUND",
+  COMMAND_ALREADY_REGISTERED: "COMMAND_ALREADY_REGISTERED",
+  REQUEST_NOT_FOUND: "REQUEST_NOT_FOUND",
+  REQUEST_ALREADY_REGISTERED: "REQUEST_ALREADY_REGISTERED",
+  INVALID_STATE: "INVALID_STATE",
+});

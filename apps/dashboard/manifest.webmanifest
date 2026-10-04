@@ -1,0 +1,10 @@
+{
+  "name": "Personal Ability Base · 个人能力基地",
+  "short_name": "PAB",
+  "description": "A modular, local-first operating system for personal capabilities.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1018",
+  "theme_color": "#0d1018",
+  "icons": []
+}

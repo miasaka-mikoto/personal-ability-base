@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "platform": "android",
+  "status": "scaffold",
+  "commands": [
+    { "name": "getSnapshot", "permission": null },
+    { "name": "executeCommand", "permission": "commands.execute" },
+    { "name": "installAbility", "permission": "network" },
+    { "name": "capture", "permission": "storage.private" },
+    { "name": "recall", "permission": "memory.read" }
+  ],
+  "events": [
+    "capture.created",
+    "memory.created",
+    "memory.updated",
+    "skill.started",
+    "skill.finished",
+    "review.created"
+  ],
+  "surfaces": [
+    "share-target",
+    "quick-tile",
+    "launcher-shortcut",
+    "widget",
+    "notification-action"
+  ],
+  "nativeArtifacts": {
+    "apk": false,
+    "aab": false,
+    "signed": false
+  }
+}

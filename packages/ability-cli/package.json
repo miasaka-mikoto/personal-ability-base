@@ -1,0 +1,10 @@
+{
+  "name": "@pab/ability-cli",
+  "version": "0.1.0",
+  "description": "Developer CLI for Personal Ability Base modules",
+  "type": "module",
+  "bin": { "pab": "./bin/pab.mjs" },
+  "dependencies": { "@pab/ability-sdk": "0.1.0" },
+  "engines": { "node": ">=22" },
+  "license": "MIT"
+}

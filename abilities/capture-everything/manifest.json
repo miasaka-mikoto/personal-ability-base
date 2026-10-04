@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "com.pab.capture-everything",
+  "name": "Capture Everything",
+  "displayName": "随手捕获",
+  "version": "0.1.0",
+  "description": "Capture thoughts, links, and shared content before they disappear.",
+  "author": "Personal Ability Base",
+  "minCoreVersion": "0.1.0",
+  "platforms": ["windows", "android", "linux", "macos", "ios", "web"],
+  "permissions": ["storage.private", "memory.read", "memory.write", "clipboard", "notifications"],
+  "dependencies": {},
+  "optionalDependencies": {},
+  "conflicts": {},
+  "contributes": {
+    "pages": [
+      { "id": "capture-everything.inbox", "title": "Capture Everything", "route": "/abilities/capture-everything" }
+    ],
+    "commands": [
+      { "id": "capture-everything.capture", "title": "Quick capture", "keybinding": "Ctrl+Shift+Space" },
+      { "id": "capture-everything.quick-capture", "title": "Quick capture (share/hotkey)" },
+      { "id": "capture-everything.list", "title": "Open capture inbox" }
+    ],
+    "cards": [
+      { "id": "capture-everything.inbox", "title": "Capture inbox", "size": "medium" }
+    ],
+    "searchProviders": [
+      { "id": "capture-everything.search", "title": "Captures", "priority": 90 }
+    ],
+    "workflows": [
+      { "id": "capture-everything.on-capture", "trigger": "capture.created" },
+      { "id": "capture-everything.on-memory", "trigger": "memory.created" }
+    ],
+    "settings": [
+      { "id": "capture-everything.retentionLimit", "type": "number", "default": 200 },
+      { "id": "capture-everything.defaultTags", "type": "json", "default": ["inbox"] }
+    ]
+  },
+  "entry": "dist/index.js",
+  "runtime": { "type": "pab-js", "apiVersion": 1 },
+  "source": { "kind": "official", "repository": "PersonalAbilityBase/ability-capture-everything" },
+  "releaseNotes": "Initial portable quick-capture inbox for Windows and Android."
+}

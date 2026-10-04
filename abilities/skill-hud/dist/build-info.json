@@ -1,0 +1,8 @@
+{
+  "id": "com.pab.skill-hud",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "entrySha256": "0011aeaf5a06fe96e6bc184b371df1222c1529000a77767e0311c25137d083b3",
+  "builtAt": "2026-10-04T11:12:15.567Z",
+  "cliVersion": "0.1.0"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "com.pab.capture-everything",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "entrySha256": "f9ac6a536330e9c7e1c4200cf0d3907d8b16cb59de535fdbf5cf6b5b308e3afe",
+  "builtAt": "2026-10-04T14:13:59.705Z",
+  "cliVersion": "0.1.0"
+}
