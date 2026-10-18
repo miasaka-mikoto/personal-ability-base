@@ -1,3 +1,4 @@
+import "./cached-downloader.test.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPairSync, sign } from "node:crypto";

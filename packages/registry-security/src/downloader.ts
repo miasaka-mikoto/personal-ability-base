@@ -145,9 +145,13 @@ export class CachedPackageDownloader implements PackageDownloader {
   async download(url: string, options: { signal?: AbortSignal; maxBytes?: number; expectedSha256?: string } = {}): Promise<DownloadResult> {
     if (options.expectedSha256) {
       const cached = await this.cache.get(options.expectedSha256);
-      if (cached) return { bytes: cached, url };
+      if (cached) {
+        if (options.maxBytes !== undefined && cached.byteLength > options.maxBytes) throw new PabRegistryError("PACKAGE_TOO_LARGE", `Package exceeds ${options.maxBytes} bytes`, { url, maxBytes: options.maxBytes });
+        return { bytes: cached, url };
+      }
     }
     const result = await this.upstream.download(url, options);
+    if (options.maxBytes !== undefined && result.bytes.byteLength > options.maxBytes) throw new PabRegistryError("PACKAGE_TOO_LARGE", `Package exceeds ${options.maxBytes} bytes`, { url, maxBytes: options.maxBytes });
     await this.cache.put(result.bytes, options.expectedSha256);
     return result;
   }
