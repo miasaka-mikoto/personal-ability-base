@@ -90,7 +90,14 @@ export class ZipPackageExtractor implements PackageExtractor {
       const compressed = bytes.subarray(dataStart, dataEnd);
       let content: Uint8Array;
       if (method === 0) content = new Uint8Array(compressed);
-      else if (method === 8) content = new Uint8Array(inflateRawSync(compressed));
+      else if (method === 8) {
+        try {
+          // Node requires a positive cap; the integrity check still rejects nonempty zero-size entries.
+          content = new Uint8Array(inflateRawSync(compressed, { maxOutputLength: Math.max(1, uncompressedSize) }));
+        } catch (error) {
+          throw new PabRegistryError("ARCHIVE_INVALID", `ZIP entry could not be decompressed within its declared size: ${name}`, { path: name }, error);
+        }
+      }
       else throw new PabRegistryError("ARCHIVE_INVALID", `Unsupported ZIP compression method ${method}: ${name}`);
       if (content.byteLength !== uncompressedSize || crc32(content) !== crc) throw new PabRegistryError("ARCHIVE_INVALID", `ZIP entry integrity check failed: ${name}`);
       await mkdir(join(target, ".."), { recursive: true });
