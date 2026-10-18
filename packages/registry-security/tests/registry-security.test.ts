@@ -297,3 +297,170 @@ test("update policy persists and honors automatic/manual, ignored, pinned and fo
     assert.deepEqual(await reloaded.getUpdatePolicy(id), { mode: "manual", ignoredVersions: ["1.1.0"] });
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+// Keep malformed fixtures small: the largest real DEFLATE output here is 8 KiB.
+function editZipEntry(input: Uint8Array, index: number, edit: (bytes: Buffer, central: number, local: number) => void): Uint8Array {
+  const bytes = Buffer.from(input);
+  let central = bytes.readUInt32LE(bytes.length - 6);
+  for (let i = 0; i < index; i += 1) central += 46 + bytes.readUInt16LE(central + 28) + bytes.readUInt16LE(central + 30) + bytes.readUInt16LE(central + 32);
+  edit(bytes, central, bytes.readUInt32LE(central + 42));
+  return bytes;
+}
+
+function declaredZipSize(input: Uint8Array, size: number, index = 0): Uint8Array {
+  return editZipEntry(input, index, (bytes, central, local) => {
+    bytes.writeUInt32LE(size, central + 24);
+    bytes.writeUInt32LE(size, local + 22);
+  });
+}
+
+function archiveError(error: unknown, causeCode?: string): boolean {
+  assert.ok(error instanceof PabRegistryError);
+  assert.equal(error.code, "ARCHIVE_INVALID");
+  if (causeCode !== undefined) {
+    assert.ok(error.cause instanceof Error);
+    assert.equal((error.cause as NodeJS.ErrnoException).code, causeCode);
+  } else assert.equal(error.cause, undefined);
+  return true;
+}
+
+test("ZIP caps real DEFLATE output before the post-inflate integrity check", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-cap-"));
+  try {
+    const bytes = declaredZipSize(zip([["payload.txt", "x".repeat(8192)]], true), 1);
+    await assert.rejects(() => new ZipPackageExtractor(4096).extract(bytes, root), (error: unknown) => {
+      archiveError(error, "ERR_BUFFER_TOO_LARGE");
+      assert.deepEqual((error as PabRegistryError).details, { path: "payload.txt" });
+      return true;
+    });
+    await assert.rejects(() => readFile(join(root, "payload.txt")), { code: "ENOENT" });
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("ZIP accepts empty DEFLATE entries with a zero archive budget", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-empty-"));
+  try {
+    await new ZipPackageExtractor(0).extract(zip([["empty.txt", ""]], true), root);
+    assert.equal((await readFile(join(root, "empty.txt"))).length, 0);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("ZIP zero declarations reject one byte by integrity and larger output by cap", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-zero-"));
+  try {
+    for (const size of [1, 2]) {
+      const destination = join(root, String(size));
+      const bytes = declaredZipSize(zip([["payload.txt", "x".repeat(size)]], true), 0);
+      await assert.rejects(() => new ZipPackageExtractor(0).extract(bytes, destination), (error: unknown) => archiveError(error, size === 2 ? "ERR_BUFFER_TOO_LARGE" : undefined));
+      await assert.rejects(() => readFile(join(destination, "payload.txt")), { code: "ENOENT" });
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("ZIP preserves equal total budgets and rejects one byte over before inflation", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-budget-"));
+  try {
+    for (const compress of [false, true]) {
+      const bytes = zip([["first.txt", "ab"], ["second.txt", "cd"]], compress);
+      const equal = join(root, `equal-${compress}`);
+      await new ZipPackageExtractor(4).extract(bytes, equal);
+      assert.equal(await readFile(join(equal, "second.txt"), "utf8"), "cd");
+      const over = join(root, `over-${compress}`);
+      // Corrupt the second stream: the declared-budget check must still win.
+      const malformed = editZipEntry(bytes, 1, (buffer, central, local) => {
+        if (compress) buffer[local + 30 + buffer.readUInt16LE(local + 26)] = 7;
+      });
+      await assert.rejects(() => new ZipPackageExtractor(3).extract(malformed, over), (error: unknown) => {
+        archiveError(error);
+        assert.equal((error as Error).message, "ZIP expands beyond 3 bytes");
+        return true;
+      });
+      assert.equal(await readFile(join(over, "first.txt"), "utf8"), "ab");
+      await assert.rejects(() => readFile(join(over, "second.txt")), { code: "ENOENT" });
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("ZIP preserves size and CRC checks for stored and deflated entries", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-integrity-"));
+  try {
+    for (const compress of [false, true]) {
+      const bytes = zip([["payload.txt", "abc"]], compress);
+      const variants = [declaredZipSize(bytes, 4), editZipEntry(bytes, 0, (buffer, central) => buffer.writeUInt32LE(0, central + 16))];
+      if (!compress) variants.push(declaredZipSize(bytes, 1));
+      for (const [index, variant] of variants.entries()) {
+        const destination = join(root, `${compress}-${index}`);
+        await assert.rejects(() => new ZipPackageExtractor().extract(variant, destination), (error: unknown) => archiveError(error));
+        await assert.rejects(() => readFile(join(destination, "payload.txt")), { code: "ENOENT" });
+      }
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("ZIP maps corrupt and truncated DEFLATE streams without losing their cause", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-corrupt-"));
+  try {
+    const bytes = zip([["payload.txt", "abc"]], true);
+    const corrupt = editZipEntry(bytes, 0, (buffer, central, local) => { buffer[local + 30 + buffer.readUInt16LE(local + 26)] = 7; });
+    const truncated = editZipEntry(bytes, 0, (buffer, central, local) => {
+      buffer.writeUInt32LE(buffer.readUInt32LE(central + 20) - 1, central + 20);
+      buffer.writeUInt32LE(buffer.readUInt32LE(local + 18) - 1, local + 18);
+    });
+    for (const [index, [variant, code]] of ([[corrupt, "Z_DATA_ERROR"], [truncated, "Z_BUF_ERROR"]] as const).entries()) {
+      const destination = join(root, String(index));
+      await assert.rejects(() => new ZipPackageExtractor().extract(variant, destination), (error: unknown) => archiveError(error, code));
+      await assert.rejects(() => readFile(join(destination, "payload.txt")), { code: "ENOENT" });
+    }
+    const truncatedEntry = editZipEntry(bytes, 0, (buffer, central) => buffer.writeUInt32LE(bytes.length, central + 20));
+    await assert.rejects(() => new ZipPackageExtractor().extract(truncatedEntry, join(root, "entry")), (error: unknown) => archiveError(error));
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("installer cleans a capped ZIP staging directory and preserves the installed version and user data", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-cleanup-"));
+  try {
+    const id = "com.test.zip-cap";
+    const one = packageFixture(id, "1.0.0");
+    const two = declaredZipSize(zip([["first.txt", "ok"], ["payload.txt", "x".repeat(8192)]], true), 1, 1);
+    const store = new ModuleStore({ root });
+    const downloader = new MemoryPackageDownloader({ [`memory://${id}/1.0.0`]: one, [`memory://${id}/1.1.0`]: two });
+    const trustPolicy = new TrustPolicy({ allowedLevels: ["community"] });
+    const options = { platform: "windows" as const, coreVersion: "1.0.0", approvedPermissions: [] };
+    await new AbilityInstaller({ store, downloader, trustPolicy, extractor: new JsonPackageExtractor() }).install(entry(id, "1.0.0", one), options);
+    const before = await store.getState(id);
+    const data = join(root, "userdata", "abilities", id, "memory.json");
+    await mkdir(join(data, ".."), { recursive: true });
+    await writeFile(data, "keep me");
+    await assert.rejects(() => new AbilityInstaller({ store, downloader, trustPolicy, extractor: new ZipPackageExtractor(4096) }).install(entry(id, "1.1.0", two), options), (error: unknown) => archiveError(error, "ERR_BUFFER_TOO_LARGE"));
+    assert.deepEqual(await store.getState(id), before);
+    assert.equal(await readFile(data, "utf8"), "keep me");
+    assert.equal(await readFile(join(root, "modules", id, "1.0.0", "dist/index.js"), "utf8"), "export default {};");
+    const { readdir } = await import("node:fs/promises");
+    assert.deepEqual(await readdir(store.stagingRoot), []);
+    await assert.rejects(() => readdir(join(root, "modules", id, "1.1.0")), { code: "ENOENT" });
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("installer trust, hash and signature gates precede ZIP extraction", async () => {
+  const root = await mkdtemp(join(tmpdir(), "pab-zip-gates-"));
+  try {
+    const bytes = declaredZipSize(zip([["payload.txt", "x".repeat(8192)]], true), 1);
+    const cases = [
+      { item: entry("com.test.gates", "1.0.0", bytes), code: "TRUST_BLOCKED", downloads: 0 },
+      { item: entry("com.test.gates", "1.0.0", bytes, { trust: "official", sha256: "0".repeat(64) }), code: "HASH_MISMATCH", downloads: 1 },
+      { item: entry("com.test.gates", "1.0.0", bytes, { trust: "official", signature: { algorithm: "ed25519", keyId: "untrusted", value: Buffer.alloc(64).toString("base64") } }), code: "SIGNATURE_INVALID", downloads: 1 },
+    ];
+    for (const [index, fixture] of cases.entries()) {
+      let downloads = 0; let extractions = 0;
+      const installer = new AbilityInstaller({
+        store: new ModuleStore({ root: join(root, String(index)) }),
+        // Deliberately leave verification to installer rather than the memory downloader.
+        downloader: { download: async () => { downloads += 1; return { bytes, url: fixture.item.packageUrl }; } },
+        extractor: { extract: async () => { extractions += 1; throw new Error("must not extract"); } },
+      });
+      await assert.rejects(() => installer.install(fixture.item, { platform: "windows", coreVersion: "1.0.0", approvedPermissions: [] }), (error: unknown) => error instanceof PabRegistryError && error.code === fixture.code);
+      assert.equal(downloads, fixture.downloads);
+      assert.equal(extractions, 0);
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
